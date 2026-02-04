@@ -1,0 +1,14 @@
+model SubCategory {
+    id          String @id @default(uuid())
+    name        String @unique // e.g., "ItemSubCategoryName"
+    displayName String // e.g., "SubCategoryDisplayName"
+
+    // Link to parent Category
+    categoryId String
+    category   Category @relation(fields: [categoryId], references: [id])
+
+    // Link to Products
+    products Product[]
+
+    @@map("sub_categories")
+}

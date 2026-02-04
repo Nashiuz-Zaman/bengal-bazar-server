@@ -1,0 +1,32 @@
+// prisma/schema/product.prisma
+
+model Product {
+  id                     String   @id @default(uuid())
+  
+  // Relations
+  categoryId             String
+  category               Category @relation(fields: [categoryId], references: [id])
+  
+  subCategoryId          String
+  subCategory            SubCategory @relation(fields: [subCategoryId], references: [id])
+
+  // Your existing fields
+  itemBrandName          String
+  brandDisplayName       String
+  itemSlug               String   @unique
+  itemDisplayName        String
+  unit                   String
+  unitSalesPrice         Float
+  unitDiscount           Float    @default(0)
+  discountSalesPrice     Float
+  itemDetails            String?  @db.Text
+  imageUrl               String
+  fullImageUrl           String
+  multipleImageData      Json?
+  unitConvert            String?
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("products")
+}

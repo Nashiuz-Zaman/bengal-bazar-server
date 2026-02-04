@@ -1,17 +1,22 @@
 {
   "name": "bengal-bazar-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "imports": {
+    "#app/*": "./dist/app/*.js",
+    "#config/*": "./dist/config/*.js",
+    "#utils/*": "./dist/utils/*.js",
+    "#shared/*": "./dist/shared/*.js"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "rimraf dist && tsc && tsc-alias",
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc",
     "start": "cross-env NODE_ENV=production node dist/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "7.3.0",
     "@sparticuz/chromium": "^143.0.4",
     "axios": "^1.13.4",
     "bcrypt": "^6.0.0",
@@ -27,8 +32,8 @@
     "lodash": "^4.17.23",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.13",
+    "pg": "^8.18.0",
     "puppeteer-core": "^24.36.1",
-    "rimraf": "^6.1.2",
     "sslcommerz-lts": "^1.2.0",
     "user-agents": "^1.1.669",
     "uuid": "^13.0.0"
@@ -37,15 +42,14 @@
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash": "^4.17.23",
-    "@types/module-alias": "^2.0.4",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.2.0",
     "@types/nodemailer": "^7.0.9",
+    "@types/pg": "^8.16.0",
     "@types/user-agents": "^1.0.4",
-    "tsc-alias": "^1.8.16",
+    "prisma": "7.3.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

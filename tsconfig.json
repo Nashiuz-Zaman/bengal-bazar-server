@@ -1,28 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs", // ✅ Required for require() and CJS
-
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-
-    "outDir": "dist",
-    "sourceMap": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
     "strict": true,
-    "skipLibCheck": true,
-
-    "baseUrl": "./src",
-    "paths": {
-      "@app/*": ["app/*"],
-      "@config/*": ["config/*"],
-      "@types/*": ["types/*"],
-      "@shared/*": ["shared/*"],
-      "@utils/*": ["utils/*"],
-      "*": ["types/*", "*"]
-    },
-    "typeRoots": ["./node_modules/@types", "./src/types"]
-  },
-  "include": ["src/**/*.ts", "src/types/**/*.d.ts"]
+    "esModuleInterop": true,
+    "ignoreDeprecations": "6.0"
+  }
 }
