@@ -1,0 +1,25 @@
+/node_modules
+/Dockerfile
+/.dockerignore
+
+# next.js
+/.next/
+.prettierrc
+/env/.env
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+/.puppeteerrc.cjs
