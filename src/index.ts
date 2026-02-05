@@ -1,9 +1,11 @@
 import express, { Request, Response, NextFunction } from "express";
 import http from "http";
+import { globalErrorHandler } from "./app/middlewares";
+import { ApiError } from "./app/utils";
 
 const app = express();
 const server = http.createServer(app);
-const port = 3000;
+const port = 5000;
 
 // 1. Basic Middlewares
 app.use(express.json());
@@ -20,19 +22,12 @@ app.get("/health", (req: Request, res: Response) => {
 
 // 3. Express 5 Catch-All (Using named wildcard)
 app.all("*path", (req: Request, res: Response, next: NextFunction) => {
-  const err = new Error(`${req.url} not found`) as any;
-  err.status = 404;
-  next(err);
+  throw ApiError.NotFound(`${req.url} not found`);
 });
-
 
 // 4. Simple Global Error Handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
+// Global error handler
+app.use(globalErrorHandler);
 
 // 5. Start Server
 server.listen(port, () => {
