@@ -1,0 +1,42 @@
+enum TransactionType {
+  PAYMENT
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  customerName  String  @db.VarChar(255)
+  customerEmail String  @db.VarChar(255)
+  customerPhone String? @db.VarChar(20)
+
+  type   TransactionType
+  status TransactionStatus
+
+  transactionId String? @unique
+
+  amount Decimal @db.Decimal(10, 2)
+
+  // To store the full gateway response (useful for debugging)
+  gatewayDetails Json?
+
+  // Refund Information (Snapshot of IRefundOptions)
+  refundAmount  Decimal? @db.Decimal(10, 2)
+  refundReason  String?
+  refundTransId String?  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
+}

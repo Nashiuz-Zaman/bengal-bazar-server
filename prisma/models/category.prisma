@@ -1,11 +1,27 @@
 model Category {
-    id          String @id @default(uuid())
-    name        String @unique //  "ItemCategoryName"
-    displayName String // "CategoryDisplayName"
+    id                  String @id @default(uuid())
+    categoryName        String @unique
+    categoryDisplayName String
 
     // Relationships
     subCategories SubCategory[]
     products      Product[]
 
     @@map("categories")
+}
+
+model SubCategory {
+    id                     String @id @default(uuid())
+    subCategoryName        String @unique
+    subCategoryDisplayName String
+
+    // Link to parent Category
+    categoryId String
+    // FIX: Added onDelete: Cascade so deleting a Category removes its SubCategories
+    category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    // Link to Products
+    products Product[]
+
+    @@map("sub_categories")
 }

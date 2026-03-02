@@ -1,0 +1,16 @@
+model Brand {
+    id               String  @id @default(uuid())
+    brandName        String  @unique // e.g., "Nike"
+    brandDisplayName String // e.g., "Nike Official Store" 
+    brandLogoUrl     String?
+    brandDescription String? @db.Text
+    brandWebsite     String?
+
+    // Relation to products
+    products Product[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("brands")
+}

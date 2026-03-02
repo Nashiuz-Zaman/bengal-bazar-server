@@ -1,0 +1,45 @@
+enum FeedbackType {
+    COMPLAINT
+    FEEDBACK
+    INQUIRY
+}
+
+enum FeedbackStatus {
+    PENDING
+    UNDER_REVIEW
+    RESOLVED
+    CLOSED
+}
+
+model Feedback {
+    id      String @id @default(uuid())
+    subject String @db.VarChar(255)
+    message String @db.Text
+
+    type   FeedbackType   @default(COMPLAINT)
+    status FeedbackStatus @default(PENDING)
+
+    // Attachments (Optional: Store URLs to images of damaged goods, etc.)
+    images String[]
+
+    // Relationships
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    // Optional: Link to a specific Product
+    productId String?
+    product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+    // Optional: Link to a specific Order
+    orderId String?
+    order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+    // Admin Response
+    adminResponse String?   @db.Text
+    resolvedAt    DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("feedbacks")
+}

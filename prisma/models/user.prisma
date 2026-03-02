@@ -1,0 +1,41 @@
+enum UserRole {
+    CUSTOMER
+    ADMIN
+    SUPERADMIN
+}
+
+enum UserStatus {
+    ACTIVE
+    BLOCKED
+    PENDING
+}
+
+model User {
+    id       String  @id @default(uuid())
+    name     String  @db.VarChar(255)
+    email    String  @unique @db.VarChar(255)
+    password String?
+    phone    String? @db.VarChar(20)
+    image    String? @db.Text
+
+    billingAddress  Json? // { address, country, city, state, zipCode }
+    shippingAddress Json? // { address, country, city, state, zipCode }
+
+    role   UserRole   @default(CUSTOMER)
+    status UserStatus @default(PENDING)
+
+    isVerified             Boolean   @default(false)
+    emailVerificationToken String?   @unique @db.Text
+    emailVerifiedAt        DateTime?
+
+    lastLoginAt DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    // relationships with other tables
+    cart   Cart?    
+    orders Order[]
+    feedbacks Feedback[]
+ 
+    @@map("users")
+}

@@ -1,32 +1,81 @@
-// prisma/schema/product.prisma
+// 1. Enums first
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  LOW_STOCK
+  OUT_OF_STOCK
+  ARCHIVED
+}
 
+// 2. Main Entities
 model Product {
-  id                     String   @id @default(uuid())
-  
-  // Relations
-  categoryId             String
-  category               Category @relation(fields: [categoryId], references: [id])
-  
-  subCategoryId          String
-  subCategory            SubCategory @relation(fields: [subCategoryId], references: [id])
+  id                 String @id @default(uuid())
+  productSlug        String @unique
+  productDisplayName String
 
-  // Your existing fields
-  itemBrandName          String
-  brandDisplayName       String
-  itemSlug               String   @unique
-  itemDisplayName        String
-  unit                   String
-  unitSalesPrice         Float
-  unitDiscount           Float    @default(0)
-  discountSalesPrice     Float
-  itemDetails            String?  @db.Text
-  imageUrl               String
-  fullImageUrl           String
-  multipleImageData      Json?
-  unitConvert            String?
-  
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  // Relations
+  productBrandId String
+  productBrand   Brand  @relation(fields: [productBrandId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  subCategoryId String
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Restrict)
+
+  // Content
+  warrantyAndSupport String        @db.Text
+  productDetails     String?       @db.Text
+  status             ProductStatus @default(DRAFT)
+  specifications     Json // Array of { key: string, value: string }
+
+  // Marketing & SEO
+  seoTitle       String?
+  seoDescription String?
+  metaKeywords   String?
+  tags           String?
+  canonicalUrl   String?
+
+  // Inverse Relations
+  variants ProductVariant[]
+
+  globalVideos String[]
+  globalImages String[]
+
+  feedbacks Feedback[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("products")
+}
+
+model ProductVariant {
+  id String @id @default(uuid())
+
+  // Identity
+  variantName String
+  sku         String @unique
+  stock       Int    @default(0)
+
+  // Pricing
+  unitSalesPrice     Decimal @db.Decimal(10, 2)
+  unitDiscount       Decimal @default(0) @db.Decimal(10, 2)
+  discountSalesPrice Decimal @db.Decimal(10, 2)
+
+  variantVideos String[]
+  variantImages String[]
+
+  // The "Flex" field
+  attributes Json     @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relationships
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_variants")
 }
