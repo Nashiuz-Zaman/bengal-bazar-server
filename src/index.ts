@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import http from "http";
-import { globalErrorHandler } from "./app/middlewares";
-import { ApiError } from "./app/utils";
+import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
+import { ApiError } from "./app/utils/ApiError.js";
 
 const app = express();
 const server = http.createServer(app);

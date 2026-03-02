@@ -3,15 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
-  "imports": {
-    "#app/*": "./dist/app/*.js",
-    "#config/*": "./dist/config/*.js",
-    "#utils/*": "./dist/utils/*.js",
-    "#shared/*": "./dist/shared/*.js"
-  },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc",
+    "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
+    "build": "rimraf dist && tsc",
+    "typecheck": "tsc --noEmit",
     "start": "cross-env NODE_ENV=production node dist/index.js"
   },
   "dependencies": {
