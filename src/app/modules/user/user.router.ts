@@ -8,6 +8,7 @@ import {
   blockUsersController,
   unblockUsersController,
   deleteUsersController,
+  resendVerificationController,
 } from "./user.controller.js";
 
 // create instances
@@ -19,6 +20,8 @@ const userRouter = Router();
 // Account creation and verification
 userRouter.post("/register", registerUserController);
 userRouter.get("/verify", verifyUserController);
+// resend verification email
+userRouter.post("/resend-verification", resendVerificationController);
 
 /**
  * Retrieval Routes (Often protected by 'auth' middleware)
