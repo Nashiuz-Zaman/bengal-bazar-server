@@ -1,7 +1,11 @@
 import { UserStatus } from "../../../../generated/prisma/client.js";
 import { ApiError } from "../../../../utils/ApiError.js";
-import * as userRepo from "../user.repository.js";
+
 import { hasElements } from "../../../../utils/hasElements.js";
+import {
+  deleteUsersFromDb,
+  updateUsersStatusInDb,
+} from "../repository/user.admin.repository.js";
 
 /**
  * Service to handle batch blocking of users.
@@ -11,10 +15,7 @@ export const blockUsers = async (ids: string[]): Promise<string> => {
   if (!hasElements(ids))
     throw ApiError.BadRequest("No user IDs provided for blocking");
 
-  const modifiedCount = await userRepo.updateUsersStatusInDb(
-    ids,
-    UserStatus.BLOCKED,
-  );
+  const modifiedCount = await updateUsersStatusInDb(ids, UserStatus.BLOCKED);
 
   // If no records were changed, they might already be blocked or the IDs are invalid
   if (modifiedCount === 0) {
@@ -32,10 +33,7 @@ export const unblockUsers = async (ids: string[]): Promise<string> => {
   if (!hasElements(ids))
     throw ApiError.BadRequest("No user IDs provided for unblocking.");
 
-  const modifiedCount = await userRepo.updateUsersStatusInDb(
-    ids,
-    UserStatus.ACTIVE,
-  );
+  const modifiedCount = await updateUsersStatusInDb(ids, UserStatus.ACTIVE);
 
   if (modifiedCount === 0) throw ApiError.NotFound("No users were unblocked");
 
@@ -50,7 +48,7 @@ export const deleteUsers = async (ids: string[]): Promise<string> => {
   if (!hasElements(ids))
     throw ApiError.BadRequest("No user IDs provided for deletion.");
 
-  const deletedCount = await userRepo.deleteUsersFromDb(ids);
+  const deletedCount = await deleteUsersFromDb(ids);
 
   if (deletedCount === 0)
     throw ApiError.NotFound("No users were found to delete.");

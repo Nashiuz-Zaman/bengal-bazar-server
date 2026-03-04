@@ -1,13 +1,18 @@
 import { RequestHandler } from "express";
-import * as userAdminServices from "../services/user.admin.service.js";
+
 import { sendSuccess } from "../../../../utils/sendSuccess.js";
+import {
+  blockUsers,
+  deleteUsers,
+  unblockUsers,
+} from "../services/user.admin.service.js";
 
 /**
  * Batch block users based on an array of IDs.
  */
 export const blockUsersController: RequestHandler = async (req, res) => {
   const { ids } = req.body;
-  const message = await userAdminServices.blockUsers(ids);
+  const message = await blockUsers(ids);
 
   sendSuccess(res, { message });
 };
@@ -17,7 +22,7 @@ export const blockUsersController: RequestHandler = async (req, res) => {
  */
 export const unblockUsersController: RequestHandler = async (req, res) => {
   const { ids } = req.body;
-  const message = await userAdminServices.unblockUsers(ids);
+  const message = await unblockUsers(ids);
 
   sendSuccess(res, { message });
 };
@@ -27,7 +32,7 @@ export const unblockUsersController: RequestHandler = async (req, res) => {
  */
 export const deleteUsersController: RequestHandler = async (req, res) => {
   const { ids } = req.body;
-  const message = await userAdminServices.deleteUsers(ids);
+  const message = await deleteUsers(ids);
 
   sendSuccess(res, { message });
 };

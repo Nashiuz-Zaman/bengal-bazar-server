@@ -2,14 +2,18 @@
 import { Router } from "express";
 import {
   registerUserController,
-  verifyUserController,
-  getUsersController,
-  getUserController,
-  blockUsersController,
-  unblockUsersController,
-  deleteUsersController,
   resendVerificationController,
-} from "./user.controller.js";
+  verifyUserController,
+} from "./controller/user.account.controller.js";
+import {
+  getUserController,
+  getUsersController,
+} from "./controller/user.query.controller.js";
+import {
+  blockUsersController,
+  deleteUsersController,
+  unblockUsersController,
+} from "./controller/user.admin.controller.js";
 
 // create instances
 const userRouter = Router();

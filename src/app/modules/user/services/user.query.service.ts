@@ -1,5 +1,5 @@
 import { ApiError } from "../../../../utils/ApiError.js";
-import * as userRepo from "../user.repository.js";
+
 import {
   ISingleUserQuery,
   TUserQueryDefaultFields,
@@ -9,6 +9,7 @@ import {
   IQueryMeta,
   TAllowedQueryExtraField,
 } from "../../../../types/generic.js";
+import { findUser, findUsersInDb } from "../repository/user.query.repository.js";
 
 /**
  * Service to retrieve a paginated list of users with metadata.
@@ -22,7 +23,7 @@ export const getUsers = async (
   data: Partial<User>[];
   meta: IQueryMeta;
 }> => {
-  const users = await userRepo.findUsersInDb(query);
+  const users = await findUsersInDb(query);
 
   return users;
 };
@@ -39,7 +40,7 @@ export const getUser = async (
   const { email, id } = query;
   if (!email && !id) throw ApiError.BadRequest("User ID/Email is required");
 
-  const user = await userRepo.findUser({ id, email }, extraFields);
+  const user = await findUser({ id, email }, extraFields);
 
   if (!user) {
     throw ApiError.NotFound(`User not found`);

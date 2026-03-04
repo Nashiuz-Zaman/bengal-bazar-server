@@ -1,13 +1,18 @@
 import { RequestHandler } from "express";
-import * as userAccountServices from "../services/user.account.service.js";
+
 import { sendAccountVerificationEmail } from "../../email/service/sendAccountVerificationEmail.js";
 import { getServerUrl } from "../../../../utils/getServerUrl.js";
 import { sendSuccess } from "../../../../utils/sendSuccess.js";
 import { clientUrl } from "../../../../index.js";
 import { ApiError } from "../../../../utils/ApiError.js";
+import {
+  registerUser,
+  resendVerificationToken,
+  verifyUser,
+} from "../services/user.account.service.js";
 
 export const registerUserController: RequestHandler = async (req, res) => {
-  const newUser = await userAccountServices.createUser(req.body);
+  const newUser = await registerUser(req.body);
 
   sendAccountVerificationEmail(
     // construct the verification email
@@ -29,7 +34,7 @@ export const verifyUserController: RequestHandler = async (req, res) => {
   const email = req.query.email as string;
   const token = req.query.token as string;
 
-  const url = await userAccountServices.verifyUser(email, token);
+  const url = await verifyUser(email, token);
 
   if (url) return res.redirect(url);
 
@@ -48,7 +53,7 @@ export const resendVerificationController: RequestHandler = async (
   if (!email) throw ApiError.BadRequest("Email is required.");
 
   // 1. Update the token in the database
-  const user = await userAccountServices.resendVerificationToken(email);
+  const user = await resendVerificationToken(email);
 
   // 2. Send the new email (Background task)
   sendAccountVerificationEmail(

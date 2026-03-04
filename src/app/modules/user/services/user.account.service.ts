@@ -1,15 +1,20 @@
 import { Prisma } from "../../../../generated/prisma/client.js";
 import { ApiError } from "../../../../utils/ApiError.js";
-import * as userRepo from "../user.repository.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { clientUrl } from "../../../../index.js";
+import { findUser } from "../repository/user.query.repository.js";
+import {
+  createUser,
+  updateUserInDb,
+  verifyUserInDb,
+} from "../repository/user.account.repository.js";
 
 /**
  * Handles user registration with a stateful 30-minute verification window.
  */
-export const createUser = async (data: Prisma.UserCreateInput) => {
-  const existingUser = await userRepo.findUser({ email: data.email });
+export const registerUser = async (data: Prisma.UserCreateInput) => {
+  const existingUser = await findUser({ email: data.email });
   if (existingUser)
     throw ApiError.Conflict("User already exists. Please login");
 
@@ -22,7 +27,7 @@ export const createUser = async (data: Prisma.UserCreateInput) => {
   // 2. Set expiration to 30 minutes from now
   const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
-  return await userRepo.createUser({
+  return await createUser({
     ...data,
     password: hashedPassword,
     emailVerificationToken: verificationToken,
@@ -37,7 +42,7 @@ export const verifyUser = async (email: string, token: string) => {
   if (!email || !token) return clientUrl;
 
   // 1. Fetch user with the necessary verification fields
-  const user = await userRepo.findUser({ email }, [
+  const user = await findUser({ email }, [
     "emailVerificationToken",
     "verificationExpiresAt",
   ]);
@@ -54,7 +59,7 @@ export const verifyUser = async (email: string, token: string) => {
   }
 
   // 5. Finalize Verification
-  const updatedUser = await userRepo.verifyUserInDb(user.id);
+  const updatedUser = await verifyUserInDb(user.id);
 
   return `${clientUrl}/verification-successful?email=${encodeURIComponent(updatedUser.email)}`;
 };
@@ -64,7 +69,7 @@ export const verifyUser = async (email: string, token: string) => {
  */
 export const resendVerificationToken = async (email: string) => {
   // 1. Find the user
-  const user = await userRepo.findUser({ email });
+  const user = await findUser({ email });
 
   if (!user?.id) {
     throw ApiError.NotFound("No account found with this email address.");
@@ -72,7 +77,9 @@ export const resendVerificationToken = async (email: string) => {
 
   // 2. Prevent resending if already verified
   if (user.status === "ACTIVE" || user.isVerified) {
-    throw ApiError.BadRequest("This account is already verified. Please login.");
+    throw ApiError.BadRequest(
+      "This account is already verified. Please login.",
+    );
   }
 
   // 3. Generate new stateful token and 30-minute expiry
@@ -80,7 +87,7 @@ export const resendVerificationToken = async (email: string) => {
   const newExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
   // 4. Update the DB (Overwriting the old token instantly invalidates it)
-  const updatedUser = await userRepo.updateUserInDb(user.id, {
+  const updatedUser = await updateUserInDb(user.id, {
     emailVerificationToken: newToken,
     verificationExpiresAt: newExpiresAt,
   });
