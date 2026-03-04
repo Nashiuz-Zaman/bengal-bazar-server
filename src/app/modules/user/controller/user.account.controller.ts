@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-
 import { sendAccountVerificationEmail } from "../../email/service/sendAccountVerificationEmail.js";
 import { getServerUrl } from "../../../../utils/getServerUrl.js";
 import { sendSuccess } from "../../../../utils/sendSuccess.js";

@@ -10,7 +10,7 @@ interface IOrderShippedProps {
   customerName: string;
   shippingTrackingNumber: string;
   shippingCarrier: string;
-  estimatedDelivery: Date;
+  estimatedDelivery: Date | string;
   year: number;
 }
 
@@ -22,12 +22,18 @@ export const getOrderShippedEmailHtml = ({
   estimatedDelivery,
   year,
 }: IOrderShippedProps): string => {
-  const formattedDelivery = estimatedDelivery.toLocaleDateString("en-GB", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  let formattedDelivery: string;
+
+  if (typeof estimatedDelivery === "object") {
+    formattedDelivery = estimatedDelivery.toLocaleDateString("en-GB", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  } else {
+    formattedDelivery = estimatedDelivery;
+  }
 
   return `
   ${getEmailWrapperStart("Your Order Has Shipped")}
