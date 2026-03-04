@@ -1,25 +1,17 @@
 import { Prisma, User, UserStatus } from "../../../generated/prisma/client.js";
-import { prisma } from "../../../prisma.js";
-import { IQueryMeta, TStringKeyOf } from "../../types/generic.js";
+import { prisma } from "../../../lib/prisma.js";
+import { IQueryMeta, TAllowedQueryExtraField } from "../../../types/generic.js";
+import {
+  ISingleUserQuery,
+  TUserQueryDefaultFields,
+} from "../../../types/user.js";
 import {
   buildFilters,
   getPagination,
   getSearch,
   getSorting,
-} from "../../utils/prismaHelpers.js";
-
-type TDefaultUserFields =
-  | "name"
-  | "id"
-  | "email"
-  | "phone"
-  | "image"
-  | "status"
-  | "role"
-  | "lastLoginAt"
-  | "isVerified";
-
-type TAllowedExtraFields = Exclude<TStringKeyOf<User>, TDefaultUserFields>;
+} from "../../../utils/prismaHelpers.js";
+import { USER_SEARCHABLE_FIELDS } from "./user.constants.js";
 
 /**
  * Updates the status for a batch of users (e.g., blocking or unblocking).
@@ -43,14 +35,15 @@ export const updateUsersStatusInDb = async (
 };
 
 /**
- * Finds a single user based on their id
- * Supports projecting additional fields beyond the base selection.
+ * Finds a single user with dynamic field selection.
+ * Guaranteed to NEVER return the password field, even if requested in extraFields.
  */
 export const findUser = async (
-  id: string,
-  extraFields: TAllowedExtraFields[] = [],
+  query: ISingleUserQuery,
+  extraFields: TAllowedQueryExtraField<User, TUserQueryDefaultFields>[] = [],
 ): Promise<Partial<User> | null> => {
-  const baseSelect: Prisma.UserSelect = {
+  // 1. Define the mandatory fields we always want
+  const select: Prisma.UserSelect = {
     id: true,
     name: true,
     email: true,
@@ -62,25 +55,35 @@ export const findUser = async (
     isVerified: true,
   };
 
+  // 2. Add extra fields dynamically, but skip 'password' for security
   extraFields.forEach((field) => {
-    (baseSelect as any)[field] = true;
+    if (field !== "password") {
+      (select as any)[field] = true;
+    }
   });
 
+  // 3. Execute query with type-safe where clause
   return await prisma.user.findUnique({
+    where: (query.email
+      ? { email: query.email }
+      : { id: query.id }) as Prisma.UserWhereUniqueInput,
+    select,
+  });
+};
+
+/**
+ * Deletes a batch of users from the database by their IDs.
+ * Returns the number of records successfully deleted.
+ */
+export const deleteUsersFromDb = async (ids: string[]): Promise<number> => {
+  const result = await prisma.user.deleteMany({
     where: {
-      id,
+      id: { in: ids },
     },
-    select: baseSelect,
   });
-};
 
-// --- Deletion Logic ---
-export const deleteUserFromDb = async (id: string) => {
-  return await prisma.user.delete({
-    where: { id },
-  });
+  return result.count;
 };
-
 export const createUser = async (data: Prisma.UserCreateInput) => {
   return await prisma.user.create({ data, omit: { password: true } });
 };
@@ -111,16 +114,6 @@ export const countUsersInDb = async (
 };
 
 /**
- * Internal-only method to get a user WITH the password.
- * Only use this in Auth/Login service for bcrypt.compare().
- */
-export const findUserForAuth = async (email: string): Promise<User | null> => {
-  return await prisma.user.findUnique({
-    where: { email },
-  });
-};
-
-/**
  * Upsert User: Useful for OAuth (Google/Github login).
  * Creates the user if they don't exist, updates them if they do.
  */
@@ -141,7 +134,7 @@ export const upsertUserInDb = async (
  * Includes metadata for frontend pagination controls.
  * @param query - Raw express query object (req.query)
  */
-export const findAllUsersInDb = async (
+export const findUsersInDb = async (
   query: Record<string, any>,
 ): Promise<{
   data: Partial<User>[];
@@ -151,9 +144,7 @@ export const findAllUsersInDb = async (
   const { skip, take, page } = getPagination(query);
   const orderBy = getSorting(query, "createdAt");
   const search = getSearch(query.searchTerm as string, [
-    "name",
-    "email",
-    "phone",
+    ...USER_SEARCHABLE_FIELDS,
   ]);
   const filters = buildFilters(query);
 
@@ -183,4 +174,34 @@ export const findAllUsersInDb = async (
       totalPages: Math.ceil(total / take),
     },
   };
+};
+
+/**
+ * Specialized update for the email verification process.
+ */
+export const verifyUserInDb = async (id: string) => {
+  return await prisma.user.update({
+    where: { id },
+    data: {
+      isVerified: true,
+      emailVerificationToken: null,
+      verificationExpiresAt: null,
+      emailVerifiedAt: new Date(),
+      lastLoginAt: new Date(),
+    },
+    omit: { password: true },
+  });
+};
+
+/**
+ * Updates only the verification token.
+ */
+export const updateVerificationTokenInDb = async (
+  id: string,
+  token: string,
+) => {
+  return await prisma.user.update({
+    where: { id },
+    data: { emailVerificationToken: token },
+  });
 };
