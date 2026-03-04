@@ -25,4 +25,4 @@ next-env.d.ts
 /.puppeteerrc.cjs
 
 /src/generated/prisma
-
+.env
