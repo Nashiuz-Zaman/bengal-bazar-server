@@ -26,6 +26,7 @@ model User {
 
     isVerified             Boolean   @default(false)
     emailVerificationToken String?   @unique @db.Text
+    verificationExpiresAt  DateTime?
     emailVerifiedAt        DateTime?
 
     lastLoginAt DateTime?

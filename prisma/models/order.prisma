@@ -20,8 +20,9 @@ model Order {
     userId       String
     user         User          @relation(fields: [userId], references: [id])
     transactions Transaction[]
-    feedbacks Feedback[]
-    orderItems OrderItem[]
+    feedbacks    Feedback[]
+    orderItems   OrderItem[]
+
     @@map("orders")
 }
 
@@ -34,7 +35,7 @@ model OrderItem {
     // --- SNAPSHOT FIELDS ---
     // These capture the state of the product at the moment of checkout
     productName        String
-    variantName        String
+    variantName        String?
     sku                String
     unitSalesPrice     Decimal @db.Decimal(10, 2)
     unitDiscount       Decimal @default(0) @db.Decimal(10, 2)
