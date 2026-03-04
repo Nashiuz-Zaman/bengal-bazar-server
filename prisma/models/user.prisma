@@ -33,9 +33,11 @@ model User {
     updatedAt   DateTime  @updatedAt
 
     // relationships with other tables
-    cart   Cart?    
-    orders Order[]
-    feedbacks Feedback[]
- 
+    cart           Cart?
+    orders         Order[]
+    feedbacks      Feedback[]
+    sessions       Session[]
+    passwordResets PasswordReset[]
+
     @@map("users")
 }
