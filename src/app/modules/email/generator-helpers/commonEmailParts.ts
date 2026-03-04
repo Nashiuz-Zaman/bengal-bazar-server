@@ -18,7 +18,7 @@ export const getEmailHeader = (subtitle: string) => `
         background-clip: text;
         text-fill-color: transparent;"
       >
-        LUMORA
+        Bengal Bazar
       </h1>
       <p style="margin:10px 0 0 0; font-size:14px; font-weight:400; color:#6b7280;">
         ${subtitle}
@@ -31,7 +31,7 @@ export const getEmailFooter = (year: number) => `
   <!-- Footer -->
   <tr>
     <td align="center" style="padding:20px; background-color:#f3f4f6; font-size:12px; color:#9ca3af;">
-      © ${year} Lumora. All rights reserved.
+      © ${year} Bengal Bazar. All rights reserved.
     </td>
   </tr>
 `;

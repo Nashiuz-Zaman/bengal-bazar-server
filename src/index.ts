@@ -1,11 +1,18 @@
 import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
-import { ApiError } from "./app/utils/ApiError.js";
+import { ApiError } from "./utils/ApiError.js";
+import { prisma } from "./lib/prisma.js";
+import { config } from "./config/env.js";
+
+export const clientUrl =
+  config.environment !== "production"
+    ? "http://localhost:3000"
+    : "https://bengalbazar.vercel.app";
 
 const app = express();
 const server = http.createServer(app);
-const port = 5000;
+const port = process.env.port || 5000;
 
 // 1. Basic Middlewares
 app.use(express.json());
@@ -29,9 +36,36 @@ app.all("*path", (req: Request, res: Response, next: NextFunction) => {
 // Global error handler
 app.use(globalErrorHandler);
 
-// 5. Start Server
-server.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
-});
+// 5. Connect DB + Start Server
+const startServer = async () => {
+  try {
+    // safety connection
+    await prisma.$connect();
+
+    if (process.env.NODE_ENV === "development") {
+      server.listen(port, () => {
+        console.log(`Server listening on http://localhost:${port}`);
+      });
+    }
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+// Graceful shutdown
+const shutdown = async () => {
+  console.log("Shutting down server...");
+
+  await prisma.$disconnect();
+  server.close(() => {
+    process.exit(0);
+  });
+};
+
+process.on("SIGINT", shutdown); // Ctrl+C
+process.on("SIGTERM", shutdown); // Docker / hosting
 
 export default app;
