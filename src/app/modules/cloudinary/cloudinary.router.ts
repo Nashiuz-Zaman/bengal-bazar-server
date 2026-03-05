@@ -7,4 +7,4 @@ const cloudinaryRouter = Router();
 
 cloudinaryRouter.get("/signed-url", getSignedUrlController);
 
-export default cloudinaryRouter;
+export { cloudinaryRouter };

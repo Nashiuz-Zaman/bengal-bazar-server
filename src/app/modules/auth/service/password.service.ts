@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { ApiError } from "../../../../utils/ApiError.js";
-import { sendEmail } from "../../../../lib/nodemailer.js";
 import {
   findUserForAuth,
   updatePassword,
@@ -12,8 +11,14 @@ import {
   findValidPasswordResetToken,
 } from "../repository/passwordReset.repository.js";
 import { clientUrl } from "../../../../index.js";
+import { sendPasswordResetEmail } from "../../email/service/sendPasswordResetEmail.js";
+import { logger } from "../../../../utils/logger.js";
 
 export const forgotPassword = async (email: string) => {
+  if (!email) {
+    throw ApiError.BadRequest("Email is required");
+  }
+
   const user = await findUserForAuth(email);
   if (!user) throw ApiError.NotFound("User not found");
 
@@ -30,10 +35,21 @@ export const forgotPassword = async (email: string) => {
 
   // 3. Send Email
   const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
-  await sendEmail(user.email, "Password Reset", resetUrl);
+  sendPasswordResetEmail(resetUrl, user.name, email).catch((err: Error) =>
+    logger.error({ err, email }, "Failed to send password reset email"),
+  );
 };
 
 export const resetPassword = async (token: string, newPassword: string) => {
+  if (!token || !newPassword) {
+    throw ApiError.BadRequest("Token and new password are required");
+  }
+
+  // Ensure password meets minimum length requirements if not handled by Zod/Validator
+  if (newPassword.length < 6) {
+    throw ApiError.BadRequest("Password must be at least 6 characters long");
+  }
+
   // 1. Validate Token via Repo
   const resetRecord = await findValidPasswordResetToken(token);
   if (!resetRecord) throw ApiError.BadRequest("Invalid or expired token");

@@ -48,11 +48,17 @@ export const loginUser = async (payload: ILoginPayload) => {
 };
 
 export const logoutUser = async (refreshToken: string) => {
+  if (!refreshToken) return;
+  
   const tokenHash = hashToken(refreshToken);
   await deleteSession(tokenHash);
 };
 
 export const refreshAccessToken = async (refreshToken: string) => {
+  if (!refreshToken) {
+    throw ApiError.Unauthorized("Refresh token missing or expired");
+  }
+
   const tokenHash = hashToken(refreshToken);
 
   // 2. Check Database

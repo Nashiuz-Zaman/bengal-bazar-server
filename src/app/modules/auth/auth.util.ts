@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { setCookie } from "../../../utils/cookie.js";
 
 /**
  * Creates a SHA-256 hash of a token string.

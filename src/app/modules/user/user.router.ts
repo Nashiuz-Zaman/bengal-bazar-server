@@ -53,4 +53,4 @@ userRouter.patch("/unblock", unblockUsersController);
 // Batch delete users
 userRouter.delete("/delete", deleteUsersController);
 
-export default userRouter;
+export { userRouter };
