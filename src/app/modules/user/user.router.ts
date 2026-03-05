@@ -14,6 +14,7 @@ import {
   deleteUsersController,
   unblockUsersController,
 } from "./controller/user.admin.controller.js";
+import { emailRateLimiter } from "../../middlewares/rateLimiter.js";
 
 // create instances
 const userRouter = Router();
@@ -25,7 +26,11 @@ const userRouter = Router();
 userRouter.post("/register", registerUserController);
 userRouter.get("/verify", verifyUserController);
 // resend verification email
-userRouter.post("/resend-verification", resendVerificationController);
+userRouter.post(
+  "/resend-verification",
+  emailRateLimiter,
+  resendVerificationController,
+);
 
 /**
  * Retrieval Routes (Often protected by 'auth' middleware)
