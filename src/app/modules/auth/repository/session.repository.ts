@@ -1,7 +1,4 @@
-import {
-  RefreshSession,
-  UserRole,
-} from "../../../../generated/prisma/client.js";
+import { Session, UserRole } from "../../../../generated/prisma/client.js";
 import { prisma } from "../../../../lib/prisma.js";
 
 /**
@@ -12,7 +9,7 @@ export const createSession = async (data: {
   tokenHash: string;
   expiresAt: Date;
 }) => {
-  return await prisma.refreshSession.create({ data });
+  return await prisma.session.create({ data });
 };
 
 /**
@@ -21,8 +18,8 @@ export const createSession = async (data: {
  */
 export const findValidSession = async (
   tokenHash: string,
-): Promise<(RefreshSession & { user: { role: UserRole } }) | null> => {
-  return await prisma.refreshSession.findUnique({
+): Promise<(Session & { user: { role: UserRole } }) | null> => {
+  return await prisma.session.findUnique({
     where: {
       tokenHash,
       expiresAt: { gt: new Date() }, // Only find if current time is before expiry
@@ -36,7 +33,7 @@ export const findValidSession = async (
  * we delete the session record entirely to invalidate it.
  */
 export const deleteSession = async (tokenHash: string): Promise<void> => {
-  await prisma.refreshSession.deleteMany({
+  await prisma.session.deleteMany({
     where: { tokenHash },
   });
 };
@@ -45,7 +42,7 @@ export const deleteSession = async (tokenHash: string): Promise<void> => {
  * Useful for 'Logout from all devices' or Password Changes.
  */
 export const deleteAllUserSessions = async (userId: string): Promise<void> => {
-  await prisma.refreshSession.deleteMany({
+  await prisma.session.deleteMany({
     where: { userId },
   });
 };

@@ -1,6 +1,6 @@
 import { prisma } from "../../../../lib/prisma.js";
 
-export const createResetToken = async (data: {
+export const createPasswordResetToken = async (data: {
   userId: string;
   token: string;
   expiresAt: Date;
@@ -10,13 +10,13 @@ export const createResetToken = async (data: {
   return await prisma.passwordReset.create({ data });
 };
 
-export const findValidResetToken = async (token: string) => {
+export const findValidPasswordResetToken = async (token: string) => {
   return await prisma.passwordReset.findFirst({
     where: { token, expiresAt: { gt: new Date() } },
     include: { user: true }, // Get the user info at the same time
   });
 };
 
-export const deleteResetToken = async (token: string) => {
+export const deletePasswordResetToken = async (token: string) => {
   return await prisma.passwordReset.deleteMany({ where: { token } });
 };
