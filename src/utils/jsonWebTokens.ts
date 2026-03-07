@@ -1,9 +1,4 @@
-import jwt, { JwtPayload, VerifyErrors } from "jsonwebtoken";
-
-export interface IJwtPayload extends JwtPayload {
-  userId?: string;
-  email?: string;
-}
+import jwt, { VerifyErrors } from "jsonwebtoken";
 
 type TTimeUnit = "ms" | "s" | "m" | "h" | "d" | "w" | "y";
 
@@ -11,8 +6,8 @@ export interface ISignOptions {
   expiresIn?: number | `${number}${TTimeUnit}`;
 }
 
-export const generateToken = (
-  payload: IJwtPayload,
+export const generateToken = <T extends Record<string, any>>(
+  payload: T,
   secret: string,
   expiresIn: ISignOptions["expiresIn"],
 ) => {
@@ -21,21 +16,20 @@ export const generateToken = (
   });
 };
 
-type TVerifyResult =
-  | { valid: true; decoded: IJwtPayload }
+type TVerifyResult<TDecoded> =
+  | { valid: true; decoded: TDecoded }
   | { valid: false; error: VerifyErrors };
 
-export const verifyToken = (
+export const verifyToken = <T extends Record<string, any>>(
   token: string,
   secret: string,
-): Promise<TVerifyResult> => {
+): Promise<TVerifyResult<T>> => {
   return new Promise((resolve) => {
     jwt.verify(token, secret, (err, decoded) => {
       if (err) {
         resolve({ valid: false, error: err });
       } else {
-        // Cast decoded to IJwtPayload safely
-        resolve({ valid: true, decoded: decoded as IJwtPayload });
+        resolve({ valid: true, decoded: decoded as T });
       }
     });
   });
