@@ -6,9 +6,7 @@ enum FeedbackType {
 
 enum FeedbackStatus {
     PENDING
-    UNDER_REVIEW
     RESOLVED
-    CLOSED
 }
 
 model Feedback {
