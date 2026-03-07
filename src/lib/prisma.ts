@@ -11,12 +11,12 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma =
+export const prismaInstance =
   global.prisma ??
   new PrismaClient({
     adapter,
   });
 
 if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma;
+  global.prisma = prismaInstance;
 }

@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
-import { prisma } from "./lib/prisma.js";
+import { prismaInstance } from "./lib/prisma.js";
 import { config } from "./config/env.js";
 
 export const clientUrl =
@@ -40,7 +40,7 @@ app.use(globalErrorHandler);
 const startServer = async () => {
   try {
     // safety connection
-    await prisma.$connect();
+    await prismaInstance.$connect();
 
     if (process.env.NODE_ENV === "development") {
       server.listen(port, () => {
@@ -59,7 +59,7 @@ startServer();
 const shutdown = async () => {
   console.log("Shutting down server...");
 
-  await prisma.$disconnect();
+  await prismaInstance.$disconnect();
   server.close(() => {
     process.exit(0);
   });

@@ -3,12 +3,13 @@ import { generateToken } from "../../../../utils/jsonWebTokens.js";
 import { ApiError } from "../../../../utils/ApiError.js";
 import { config } from "../../../../config/env.js";
 import { hashToken } from "../auth.util.js";
-import { findUserForAuth } from "../repository/auth.repository.js";
+import { findUserForAuthInDb } from "../repository/auth.repository.js";
 import {
-  createSession,
-  deleteSession,
-  findValidSession,
+  createSessionInDb,
+  deleteSessionInDb,
+  findValidSessionInDb,
 } from "../repository/session.repository.js";
+import { IAuthJwtPayload } from "../../../../types/auth.js";
 
 interface ILoginPayload {
   email: string;
@@ -17,7 +18,7 @@ interface ILoginPayload {
 
 export const loginUser = async (payload: ILoginPayload) => {
   // 1. Find user with password
-  const user = await findUserForAuth(payload.email);
+  const user = await findUserForAuthInDb(payload.email);
   if (!user) throw ApiError.Unauthorized("Invalid email/password");
 
   // 2. Verify Password
@@ -28,17 +29,21 @@ export const loginUser = async (payload: ILoginPayload) => {
   if (!isPasswordMatch) throw ApiError.Unauthorized("Invalid email/password");
 
   // 3. Generate Tokens
-  const accessToken = generateToken(
+  const accessToken = generateToken<IAuthJwtPayload>(
     { id: user.id, role: user.role },
     config.jwtSecret!,
     "15m",
   );
-  const refreshToken = generateToken({ id: user.id }, config.jwtSecret!, "7d");
+  const refreshToken = generateToken<IAuthJwtPayload>(
+    { id: user.id },
+    config.jwtSecret!,
+    "7d",
+  );
   const tokenHash = hashToken(refreshToken);
 
   // 4. Save Session (Hash the refresh token before saving for security)
 
-  await createSession({
+  await createSessionInDb({
     userId: user.id,
     tokenHash,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
@@ -49,9 +54,9 @@ export const loginUser = async (payload: ILoginPayload) => {
 
 export const logoutUser = async (refreshToken: string) => {
   if (!refreshToken) return;
-  
+
   const tokenHash = hashToken(refreshToken);
-  await deleteSession(tokenHash);
+  await deleteSessionInDb(tokenHash);
 };
 
 export const refreshAccessToken = async (refreshToken: string) => {
@@ -62,11 +67,11 @@ export const refreshAccessToken = async (refreshToken: string) => {
   const tokenHash = hashToken(refreshToken);
 
   // 2. Check Database
-  const session = await findValidSession(tokenHash);
+  const session = await findValidSessionInDb(tokenHash);
   if (!session) throw ApiError.Unauthorized("Session expired or invalid");
 
   // 3. Generate new Access Token
-  const accessToken = generateToken(
+  const accessToken = generateToken<IAuthJwtPayload>(
     { id: session.userId, role: session.user.role },
     config.jwtSecret!,
     "15m",

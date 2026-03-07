@@ -1,6 +1,6 @@
 import { sendEmail } from "../../../../lib/nodemailer.js";
 import { formatPrice } from "../../../../utils/formatPrice.js";
-import { prisma } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../lib/prisma.js";
 import { Transaction } from "../../../../generated/prisma/client.js";
 import { ApiError } from "../../../../utils/ApiError.js";
 import { getRefundProcessedEmailHtml } from "../generator-helpers/getRefundProcessedEmailHtml.js";
@@ -13,7 +13,7 @@ export const sendPaymentRefundedEmail = async (
   financialTransaction: Transaction,
 ) => {
   // 1. Fetch the associated order to get the orderNumber
-  const order = await prisma.order.findUnique({
+  const order = await prismaInstance.order.findUnique({
     where: { id: financialTransaction.orderId },
     select: { orderNumber: true },
   });

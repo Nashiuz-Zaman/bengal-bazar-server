@@ -79,3 +79,14 @@ export const getCart = async (userId?: string, cartId?: string) => {
     }
   }
 };
+
+/**
+ * Find out the actual carts Id resolving from userId or cartId in the cookie
+ */
+export const resolveCartId = async (userId?: string, cookieCartId?: string) => {
+  if (userId) {
+    const cart = await findCartInDb({ userId });
+    return cart?.id;
+  }
+  return cookieCartId;
+};
