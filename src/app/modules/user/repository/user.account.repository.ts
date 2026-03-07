@@ -1,11 +1,11 @@
 import { Prisma } from "../../../../generated/prisma/client.js";
-import { prisma } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../lib/prisma.js";
 
 /**
  * Creates a single user
  */
-export const createUser = async (data: Prisma.UserCreateInput) => {
-  return await prisma.user.create({ data, omit: { password: true } });
+export const createUserInDb = async (data: Prisma.UserCreateInput) => {
+  return await prismaInstance.user.create({ data, omit: { password: true } });
 };
 
 /**
@@ -16,7 +16,7 @@ export const updateUserInDb = async (
   id: string,
   data: Prisma.UserUpdateInput,
 ) => {
-  return await prisma.user.update({
+  return await prismaInstance.user.update({
     where: { id },
     data,
     omit: { password: true },
@@ -31,7 +31,7 @@ export const upsertUserInDb = async (
   email: string,
   data: Prisma.UserCreateInput,
 ) => {
-  return await prisma.user.upsert({
+  return await prismaInstance.user.upsert({
     where: { email },
     update: { lastLoginAt: new Date() },
     create: data,
@@ -43,7 +43,7 @@ export const upsertUserInDb = async (
  * Specialized update for the email verification process.
  */
 export const verifyUserInDb = async (id: string) => {
-  return await prisma.user.update({
+  return await prismaInstance.user.update({
     where: { id },
     data: {
       isVerified: true,
@@ -63,7 +63,7 @@ export const updateVerificationTokenInDb = async (
   id: string,
   token: string,
 ) => {
-  return await prisma.user.update({
+  return await prismaInstance.user.update({
     where: { id },
     data: { emailVerificationToken: token },
   });

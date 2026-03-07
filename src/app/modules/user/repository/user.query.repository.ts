@@ -1,5 +1,5 @@
 import { Prisma, User } from "../../../../generated/prisma/client.js";
-import { prisma } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../lib/prisma.js";
 import {
   IQueryMeta,
   TAllowedQueryExtraField,
@@ -15,6 +15,17 @@ import {
   getSorting,
 } from "../../../../utils/prismaHelpers.js";
 import { USER_SEARCHABLE_FIELDS } from "../user.constants.js";
+
+/**
+ * Checks if an user exists and returns id, role and status of the user.
+ */
+export const userExists = async (id: string) => {
+  const user = await prismaInstance.user.findUnique({
+    where: { id },
+    select: { id: true, role: true, status: true },
+  });
+  return user;
+};
 
 /**
  * Finds a single user with dynamic field selection.
@@ -45,7 +56,7 @@ export const findUser = async (
   });
 
   // 3. Execute query with type-safe where clause
-  return await prisma.user.findUnique({
+  return await prismaInstance.user.findUnique({
     where: (query.email
       ? { email: query.email }
       : { id: query.id }) as Prisma.UserWhereUniqueInput,
@@ -60,7 +71,7 @@ export const findUser = async (
 export const countUsersInDb = async (
   where: Prisma.UserWhereInput,
 ): Promise<number> => {
-  return await prisma.user.count({ where });
+  return await prismaInstance.user.count({ where });
 };
 
 /**
@@ -89,14 +100,14 @@ export const findUsersInDb = async (
 
   // 3. Execute queries in parallel for better performance
   const [data, total] = await Promise.all([
-    prisma.user.findMany({
+    prismaInstance.user.findMany({
       where,
       skip,
       take,
       orderBy,
       omit: { password: true },
     }),
-    prisma.user.count({ where }),
+    prismaInstance.user.count({ where }),
   ]);
 
   return {

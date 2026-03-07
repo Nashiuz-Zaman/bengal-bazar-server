@@ -5,7 +5,7 @@ import crypto from "crypto";
 import { clientUrl } from "../../../../index.js";
 import { findUser } from "../repository/user.query.repository.js";
 import {
-  createUser,
+  createUserInDb,
   updateUserInDb,
   verifyUserInDb,
 } from "../repository/user.account.repository.js";
@@ -27,7 +27,7 @@ export const registerUser = async (data: Prisma.UserCreateInput) => {
   // 2. Set expiration to 30 minutes from now
   const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
-  return await createUser({
+  return await createUserInDb({
     ...data,
     password: hashedPassword,
     emailVerificationToken: verificationToken,
