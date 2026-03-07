@@ -1,4 +1,4 @@
-import { prismaInstance } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
 
 export const createPasswordResetTokenInDb = async (data: {
   userId: string;

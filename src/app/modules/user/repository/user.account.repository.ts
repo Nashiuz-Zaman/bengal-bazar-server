@@ -1,5 +1,5 @@
 import { Prisma } from "../../../../generated/prisma/client.js";
-import { prismaInstance } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
 
 /**
  * Creates a single user

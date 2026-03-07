@@ -2,7 +2,7 @@ import { ApiError } from "../../../utils/ApiError.js";
 
 import { findCouponByCode } from "./coupon.repository.js";
 import { Prisma } from "../../../generated/prisma/client.js";
-import { DbClient } from "../../../lib/transactionWrapper.js";
+import { DbClient } from "../../../libs/transactionWrapper.js";
 import { formatPrice } from "../../../utils/formatPrice.js";
 
 /**

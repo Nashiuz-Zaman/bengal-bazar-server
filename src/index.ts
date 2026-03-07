@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import { globalErrorHandler } from "./app/middlewares/globalErrorHandler.js";
 import { ApiError } from "./utils/ApiError.js";
-import { prismaInstance } from "./lib/prisma.js";
+import { prismaInstance } from "./libs/prisma.js";
 import { config } from "./config/env.js";
 
 export const clientUrl =

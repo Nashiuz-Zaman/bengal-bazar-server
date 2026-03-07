@@ -1,4 +1,4 @@
-import { runInTransaction } from "../../../../lib/transactionWrapper.js";
+import { runInTransaction } from "../../../../libs/transactionWrapper.js";
 import { ApiError } from "../../../../utils/ApiError.js";
 import { createCartInDb } from "../repository/cart.action.repository.js";
 import {
@@ -21,7 +21,7 @@ export const addItemToCart = async (
 ) => {
   if (!variantId) throw ApiError.BadRequest("Variant ID is required");
 
-  // Atomic db action via transaction
+  // Run inside a transaction
   return await runInTransaction(async (tx) => {
     const cartType = userId ? "user" : "guest";
     let isNewCart = false;
@@ -73,6 +73,7 @@ export const updateCartItemQty = async (
   if (!cartId || !cartItemId)
     throw ApiError.BadRequest("Cart and item Id are required");
 
+  // Run inside a transaction
   return await runInTransaction(async (tx) => {
     // 1. Remove from cart if new qty is 0
     if (quantity <= 0) {
@@ -105,6 +106,7 @@ export const removeItemFromCart = async (
     throw ApiError.BadRequest("Cart ID and Item ID are required");
   }
 
+  // Run inside a transaction
   return await runInTransaction(async (tx) => {
     //  Ownership & Existence Check
     const item = await findCartItemInDb(cartItemId, tx);

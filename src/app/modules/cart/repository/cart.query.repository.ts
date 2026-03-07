@@ -1,6 +1,6 @@
 import { Prisma } from "../../../../generated/prisma/client.js";
-import { prismaInstance } from "../../../../lib/prisma.js";
-import { DbClient } from "../../../../lib/transactionWrapper.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
+import { DbClient } from "../../../../libs/transactionWrapper.js";
 
 // 1. Centralize your data shape
 export const CART_INCLUDE_DETAILS = {

@@ -1,7 +1,7 @@
 import { Prisma } from "../../../../generated/prisma/client.js";
-import { prismaInstance } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
 import { CART_INCLUDE_DETAILS } from "./cart.query.repository.js";
-import { DbClient } from "../../../../lib/transactionWrapper.js";
+import { DbClient } from "../../../../libs/transactionWrapper.js";
 
 /**
  * Creates a new cart.

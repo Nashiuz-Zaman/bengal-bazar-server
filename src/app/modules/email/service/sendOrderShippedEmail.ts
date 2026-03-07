@@ -1,5 +1,5 @@
 import { Order } from "../../../../generated/prisma/client.js";
-import { sendEmail } from "../../../../lib/nodemailer.js";
+import { sendEmail } from "../../../../libs/nodemailer.js";
 import { getOrderShippedEmailHtml } from "../generator-helpers/getOrderShippedEmailHtml.js";
 
 /**

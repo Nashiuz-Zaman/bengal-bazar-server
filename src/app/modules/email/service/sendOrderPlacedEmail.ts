@@ -1,4 +1,4 @@
-import { sendEmail } from "../../../../lib/nodemailer.js";
+import { sendEmail } from "../../../../libs/nodemailer.js";
 import { TOrderWithItems } from "../../../../types/order.js";
 import { getOrderPlacedEmailHtml } from "../generator-helpers/getOrderPlacedEmailHtml.js";
 

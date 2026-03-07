@@ -1,5 +1,5 @@
 import { getVerificationEmailHtml } from "../generator-helpers/getVerificationEmailHtml.js";
-import { sendEmail } from "../../../../lib/nodemailer.js";
+import { sendEmail } from "../../../../libs/nodemailer.js";
 
 export const sendAccountVerificationEmail = async (
   url: string,

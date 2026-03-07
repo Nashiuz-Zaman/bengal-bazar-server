@@ -1,4 +1,3 @@
-// src/lib/db.ts
 import { Prisma } from "../generated/prisma/client.js";
 import { prismaInstance } from "./prisma.js";
 

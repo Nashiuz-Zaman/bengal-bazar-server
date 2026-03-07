@@ -52,4 +52,44 @@ export const getShippingAndTax = (
   return { shippingFee, tax, taxableAmount };
 };
 
+/**
+ * Calculates all financial totals for a cart.
+ * Can accept pre-calculated subtotal/qty to avoid redundant loops.
+ */
+export const calculateCartTotals = (
+  items: TCartItemWithVariant[],
+  coupon: Coupon | null = null,
+  calculateSubtotalAndTotalQty = true,
+  preCalculated?: { subtotal: Prisma.Decimal; totalItemQty: number },
+) => {
+  // 1. Determine subtotal and item qty based on the toggle
+  const { subtotal, totalItemQty } = calculateSubtotalAndTotalQty
+    ? getSubtotalAndTotalQty(items)
+    : (preCalculated ?? getSubtotalAndTotalQty(items)); // Fallback
 
+  // 2. Calculate Discount Amount
+  let discountAmount = new Prisma.Decimal(0);
+
+  if (coupon) {
+    discountAmount = getDiscountAmount(coupon, subtotal);
+  }
+
+  // 3. Calculate shipping and tax
+  const { shippingFee, tax, taxableAmount } = getShippingAndTax(
+    subtotal,
+    discountAmount,
+  );
+
+  // 4. Final Total
+  const total = taxableAmount.plus(tax).plus(shippingFee);
+
+  return {
+    subtotal,
+    discount: discountAmount,
+    tax,
+    shippingFee,
+    total,
+    totalItemQty,
+    couponCode: coupon?.code ?? null,
+  };
+};

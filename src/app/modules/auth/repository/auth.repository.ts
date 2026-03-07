@@ -1,5 +1,5 @@
 import { User } from "../../../../generated/prisma/client.js";
-import { prismaInstance } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
 
 /**
  * Internal-only method to get a user WITH the password hash.

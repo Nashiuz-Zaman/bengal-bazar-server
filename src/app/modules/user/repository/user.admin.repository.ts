@@ -1,5 +1,5 @@
 import { UserStatus } from "../../../../generated/prisma/enums.js";
-import { prismaInstance } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
 
 /**
  * Updates the status for a batch of users (e.g., blocking or unblocking).

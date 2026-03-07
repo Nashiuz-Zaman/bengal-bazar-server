@@ -1,6 +1,6 @@
-import { prismaInstance } from "../../../lib/prisma.js";
+import { prismaInstance } from "../../../libs/prisma.js";
 import { Prisma } from "../../../generated/prisma/client.js";
-import { DbClient } from "../../../lib/transactionWrapper.js";
+import { DbClient } from "../../../libs/transactionWrapper.js";
 
 /**
  * Finds a specific coupon by its unique string code.

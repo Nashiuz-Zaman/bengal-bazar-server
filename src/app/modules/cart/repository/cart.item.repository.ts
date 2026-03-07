@@ -1,5 +1,5 @@
-import { prismaInstance } from "../../../../lib/prisma.js";
-import { DbClient } from "../../../../lib/transactionWrapper.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
+import { DbClient } from "../../../../libs/transactionWrapper.js";
 
 /**
  * Atomic Upsert: Adds a variant to the cart.

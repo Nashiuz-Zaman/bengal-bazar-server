@@ -1,5 +1,5 @@
 import { getPasswordResetEmailHtml } from "../generator-helpers/getPasswordResetHtml.js";
-import { sendEmail } from "../../../../lib/nodemailer.js";
+import { sendEmail } from "../../../../libs/nodemailer.js";
 
 /**
  * Service to send a password reset link to the user.

@@ -1,6 +1,6 @@
-import { sendEmail } from "../../../../lib/nodemailer.js";
+import { sendEmail } from "../../../../libs/nodemailer.js";
 import { formatPrice } from "../../../../utils/formatPrice.js";
-import { prismaInstance } from "../../../../lib/prisma.js";
+import { prismaInstance } from "../../../../libs/prisma.js";
 import { Transaction } from "../../../../generated/prisma/client.js";
 import { ApiError } from "../../../../utils/ApiError.js";
 import { getRefundProcessedEmailHtml } from "../generator-helpers/getRefundProcessedEmailHtml.js";
