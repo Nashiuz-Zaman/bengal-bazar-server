@@ -1,15 +1,17 @@
 import { prismaInstance } from "../../../../lib/prisma.js";
+import { DbClient } from "../../../../lib/transactionWrapper.js";
 
 /**
  * Atomic Upsert: Adds a variant to the cart.
  * If the variant is already there, it increments the quantity.
  */
-export const addItemToCart = async (
+export const addItemToCartInDb = async (
   cartId: string,
   variantId: string,
   quantity: number,
+  tx: DbClient = prismaInstance,
 ) => {
-  return await prismaInstance.cartItem.upsert({
+  return await tx.cartItem.upsert({
     where: {
       cartId_variantId: { cartId, variantId },
     },
@@ -27,8 +29,11 @@ export const addItemToCart = async (
 /**
  * Removes a variant from the cart.
  */
-export const removeItemFromCart = async (cartItemId: string) => {
-  return await prismaInstance.cartItem.delete({
+export const removeItemFromCartInDb = async (
+  cartItemId: string,
+  tx: DbClient = prismaInstance,
+) => {
+  return await tx.cartItem.delete({
     where: { id: cartItemId },
   });
 };
@@ -36,12 +41,22 @@ export const removeItemFromCart = async (cartItemId: string) => {
 /**
  * Updates quantity for a specific item.
  */
-export const updateItemQuantity = async (
+export const updateItemQuantityInDb = async (
   cartItemId: string,
   quantity: number,
+  tx: DbClient = prismaInstance,
 ) => {
-  return await prismaInstance.cartItem.update({
+  await tx.cartItem.update({
     where: { id: cartItemId },
     data: { quantity },
+  });
+};
+
+export const findCartItemInDb = async (
+  id: string,
+  tx: DbClient = prismaInstance,
+) => {
+  return await tx.cartItem.findUnique({
+    where: { id },
   });
 };
